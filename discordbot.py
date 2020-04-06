@@ -1,21 +1,21 @@
-from discord.ext import commands
-import os
-import traceback
+import discord
+from discord.ext import tasks
+from datetime import datetime
 
-bot = commands.Bot(command_prefix='/')
+import os
+
+client = discord.Client()
+
 token = os.environ['DISCORD_BOT_TOKEN']
 
+@tasks.loop(seconds=60)
+async def loop():
+    now = datetime.now().strftime('%m/%d-%H:%M')
+    if now == '04/06-22:42':
+        alert_channel = client.get_channel(694093239954833412)
+        msg = f'DSS説明会まであと15分！'
+        await alert_channel.send(msg)
 
-@bot.event
-async def on_command_error(ctx, error):
-    orig_error = getattr(error, "original", error)
-    error_msg = ''.join(traceback.TracebackException.from_exception(orig_error).format())
-    await ctx.send(error_msg)
+loop.start()
 
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send('pong')
-
-
-bot.run(token)
+client.run(token)
